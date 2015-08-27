@@ -296,16 +296,10 @@ class PepperCli(object):
         exit_code = exit_code if self.options.fail_if_minions_dont_respond else 0
         return exit_code, ret
 
-    def run(self):
+    def _api_call(self):
         '''
-        Parse all arguments and call salt-api
+        Build & send a lowstate to salt-api
         '''
-        self.parse()
-
-        # move logger instantiation to method?
-        logger.addHandler(logging.StreamHandler())
-        logger.setLevel(max(logging.ERROR - (self.options.verbose * 10), 1))
-
         load = self.parse_cmd()
         creds = iter(self.parse_login())
 
@@ -319,3 +313,15 @@ class PepperCli(object):
             exit_code = 0
 
         return (exit_code, json.dumps(ret, sort_keys=True, indent=4))
+
+    def run(self):
+        '''
+        Parse all arguments and call salt-api
+        '''
+        self.parse()
+
+        # move logger instantiation to method?
+        logger.addHandler(logging.StreamHandler())
+        logger.setLevel(max(logging.ERROR - (self.options.verbose * 10), 1))
+
+        return self._api_call()
